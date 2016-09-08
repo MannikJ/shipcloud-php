@@ -41,15 +41,13 @@ abstract class Api implements ApiInterface
         }
         catch (\GuzzleHttp\Exception\RequestException $re)
         {
-            $response = $re->getResponse();           
+            $response = $re->getResponse();       
             $errorMessageArray = json_decode($response->getBody()->getContents(),true);
-            $errorMessage="";
+            $shipcloudErrors=[];
             if(array_key_exists("errors", $errorMessageArray)) {         
-                foreach($errorMessageArray["errors"] as $error) {
-                    $errorMessage .= "Shipcloud Error: " . $error . "\n";
-                }
+                $shipcloudErrors = $errorMessageArray["errors"];
             }
-            throw new ShipcloudException($errorMessage, $response->getStatusCode());          
+            throw new ShipcloudException($response->getReasonPhrase(), $response->getStatusCode(), $shipcloudErrors);          
         }
     }
 
